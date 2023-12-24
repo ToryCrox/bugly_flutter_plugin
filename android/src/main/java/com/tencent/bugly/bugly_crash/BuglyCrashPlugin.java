@@ -1,12 +1,15 @@
 package com.tencent.bugly.bugly_crash;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 import com.tencent.bugly.crashreport.CrashReport;
 import android.content.Context;
+
+import androidx.annotation.NonNull;
+
 import java.util.Map;
 import com.tencent.bugly.crashreport.BuglyLog;
 /**
@@ -14,13 +17,22 @@ import com.tencent.bugly.crashreport.BuglyLog;
  * @author rockypzhang
  * @since 2019/5/28
  */
-public class BuglyCrashPlugin implements MethodCallHandler {
+public class BuglyCrashPlugin implements FlutterPlugin,  MethodCallHandler {
   /** Plugin registration. */
-  private static Context mContext;
-  public static void registerWith(Registrar registrar) {
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "bugly");
-    mContext = registrar.activeContext();
-    channel.setMethodCallHandler(new BuglyCrashPlugin());
+  private Context mContext;
+  private MethodChannel channel;
+  @Override
+  public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+    mContext = binding.getApplicationContext();
+    channel = new MethodChannel(binding.getBinaryMessenger(), "bugly");
+    channel.setMethodCallHandler(this);
+  }
+
+  @Override
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    if (channel != null) {
+      channel.setMethodCallHandler(null);
+    }
   }
 
   /**
@@ -30,7 +42,7 @@ public class BuglyCrashPlugin implements MethodCallHandler {
    * @param result 返回结果
    */
   @Override
-  public void onMethodCall(MethodCall call, Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     if (call.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
     } else if (call.method.equals("initCrashReport")){
@@ -135,7 +147,6 @@ public class BuglyCrashPlugin implements MethodCallHandler {
    * 打印上报用户自定义日志
    *
    * @param call flutter方法回调
-   * @param content 内容
    */
   private void buglyLog(MethodCall call){
     String tag = "";
@@ -159,4 +170,6 @@ public class BuglyCrashPlugin implements MethodCallHandler {
     }
     BuglyCrashPluginLog.d("tag:"+tag+" content:"+content);
   }
+
+
 }

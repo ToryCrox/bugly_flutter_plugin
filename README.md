@@ -10,4 +10,3 @@ iOS Crash Native Sdk Doc： https://bugly.qq.com/docs/user-guide/instruction-man
 
 pub dev : https://pub.dev/packages/bugly_crash/
 
-
