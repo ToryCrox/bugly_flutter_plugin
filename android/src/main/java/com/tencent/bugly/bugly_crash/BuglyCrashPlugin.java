@@ -76,7 +76,7 @@ public class BuglyCrashPlugin implements FlutterPlugin,  MethodCallHandler {
       }
       BuglyCrashPluginLog.d("type:"+type+"error:"+error+" stackTrace:"+stackTrace
         +"extraInfo:"+extraInfo);
-      int category = 8;
+      int category = 6;
       CrashReport.postException(category,type,error,stackTrace,extraInfo);
     }else if (call.method.equals("setAppChannel")){
       String appChannel = "";
